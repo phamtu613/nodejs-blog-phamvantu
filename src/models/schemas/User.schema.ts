@@ -16,7 +16,7 @@ enum UserRole {
 
 interface UserType {
   _id?: ObjectId
-  name?: string
+  name: string
   email: string
   password: string
   avatar?: string
@@ -47,7 +47,7 @@ export default class User {
   constructor(user: UserType) {
     const date = new Date()
     this._id = user._id
-    this.name = user.name || ''
+    this.name = user.name
     this.email = user.email
     this.password = user.password
     this.avatar = user.avatar || ''
