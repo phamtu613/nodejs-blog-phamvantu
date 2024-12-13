@@ -1,5 +1,7 @@
-import { Request, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import usersService from '~/services/users.services'
+import { ParamsDictionary } from 'express-serve-static-core'
+import { RegisterReqBody } from '~/models/schemas/requests/User.requests'
 
 // Xử lý logic ở đây sau khi dữ liệu đã được validate ở middleware
 export const loginController = (req: Request, res: Response) => {
@@ -12,15 +14,12 @@ export const loginController = (req: Request, res: Response) => {
   }
 }
 
-export const registerController = async (req: Request, res: Response) => {
-  const { email, password, name } = req.body
-  try {
-    const result = await usersService.register({ email, password, name })
-    res.json({ message: 'Register successfully', data: result })
-    return
-  } catch (error) {
-    console.log(error)
-    res.status(400).json({ message: 'Register fail', error })
-    return
-  }
+export const registerController = (
+  req: Request<ParamsDictionary, any, RegisterReqBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  const result = usersService.register(req.body)
+  res.json({ message: 'Đăng ký thành công', data: result })
+  return
 }

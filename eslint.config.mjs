@@ -16,8 +16,8 @@ export default [
       prettier: eslintPluginPrettier
     },
     rules: {
-      '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-unused-vars': 'warn',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unused-vars': 'off', // bật lên thì khi chạy npm run clean fix thì sẽ tự động xóa những biến không sử dụng nên đôi khi sẽ bị lỗi
       'prettier/prettier': [
         'warn',
         {

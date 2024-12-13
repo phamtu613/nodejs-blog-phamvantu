@@ -1,18 +1,7 @@
 // Dung interface thì nó chỉ kieu dữ liệu
 // Dùng class thì vừa đại diện cho kiểu dữ liệu vừa đại diện cho 1 object, vì mình có thể lấy class đó để tạo ra 1 object mới
-
 import { ObjectId } from 'mongodb'
-
-enum UserVerifyStatus {
-  Unverified, // chưa xác thực email, mặc định = 0
-  Verified, // đã xác thực email
-  Banned // bị khóa
-}
-
-enum UserRole {
-  Admin, // quản trị viên
-  User // người dùng
-}
+import { UserRole, UserVerifyStatus } from '~/constants/enums'
 
 interface UserType {
   _id?: ObjectId
