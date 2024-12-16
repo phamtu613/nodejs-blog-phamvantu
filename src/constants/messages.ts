@@ -13,5 +13,8 @@ export const USERS_MESSAGES = {
   CONFIRM_PASSWORD_MUST_BE_A_STRING: 'Xác nhận mật khẩu phải là chuỗi',
   CONFIRM_PASSWORD_LENGTH_MUST_BE_FROM_6_TO_50: 'Xác nhận mật khẩu phải có ít nhất 6 ký tự',
   CONFIRM_PASSWORD_MUST_BE_THE_SAME_AS_PASSWORD: 'Xác nhận mật khẩu phải giống mật khẩu',
-  ROLE_IS_INVALID: 'Vai trò không hợp lệ'
+  ROLE_IS_INVALID: 'Vai trò không hợp lệ',
+  USER_NOT_FOUND: 'Người dùng không tồn tại',
+  LOGIN_SUCCESS: 'Đăng nhập thành công',
+  EMAIL_OR_PASSWORD_IS_INCORRECT: 'Email hoặc mật khẩu không chính xác'
 } as const
