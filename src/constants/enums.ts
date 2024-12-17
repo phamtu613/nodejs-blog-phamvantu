@@ -9,7 +9,7 @@ export enum UserRole {
   User // người dùng
 }
 
-export enum TokenTypes {
+export enum TokenType {
   AccessToken,
   RefreshToken,
   ForgotPasswordToken,

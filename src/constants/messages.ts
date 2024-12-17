@@ -16,5 +16,10 @@ export const USERS_MESSAGES = {
   ROLE_IS_INVALID: 'Vai trò không hợp lệ',
   USER_NOT_FOUND: 'Người dùng không tồn tại',
   LOGIN_SUCCESS: 'Đăng nhập thành công',
-  EMAIL_OR_PASSWORD_IS_INCORRECT: 'Email hoặc mật khẩu không chính xác'
+  EMAIL_OR_PASSWORD_IS_INCORRECT: 'Email hoặc mật khẩu không chính xác',
+  ACCESS_TOKEN_IS_REQUIRED: 'Accesstoken không được để trống',
+  LOGOUT_SUCCESS: 'Đăng xuất thành công',
+  REFRESH_TOKEN_IS_REQUIRED: 'Refreshtoken không được để trống',
+  USED_REFRESH_TOKEN_OR_NOT_EXIST: 'Refreshtoken đã được sử dụng hoặc không tồn tại',
+  REFRESH_TOKEN_SUCCESS: 'Làm mới accesstoken thành công'
 } as const
