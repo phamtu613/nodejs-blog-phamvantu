@@ -21,5 +21,8 @@ export const USERS_MESSAGES = {
   LOGOUT_SUCCESS: 'Đăng xuất thành công',
   REFRESH_TOKEN_IS_REQUIRED: 'Refreshtoken không được để trống',
   USED_REFRESH_TOKEN_OR_NOT_EXIST: 'Refreshtoken đã được sử dụng hoặc không tồn tại',
-  REFRESH_TOKEN_SUCCESS: 'Làm mới accesstoken thành công'
+  REFRESH_TOKEN_SUCCESS: 'Làm mới accesstoken thành công',
+  EMAIL_VERIFICATION_TOKEN_IS_REQUIRED: 'Email verification token không được để trống',
+  EMAIL_ALREADY_VERIFIED: 'Email đã được xác thực trước đó',
+  EMAIL_VERIFICATION_SUCCESS: 'Xác thực email thành công'
 } as const

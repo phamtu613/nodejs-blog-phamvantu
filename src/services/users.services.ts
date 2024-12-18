@@ -44,6 +44,20 @@ class UsersService {
     return Promise.all([this.signAccessToken({ user_id, verify }), this.signRefreshToken({ user_id, verify })])
   }
 
+  private signEmailVerifyToken({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
+    return signToken({
+      payload: {
+        user_id,
+        token_type: TokenType.EmailVerifyToken,
+        verify
+      },
+      privateKey: process.env.JWT_SECRET_EMAIL_VERIFY_TOKEN as string,
+      options: {
+        expiresIn: process.env.EMAIL_VERIFY_TOKEN_EXPIRES_IN
+      }
+    })
+  }
+
   async login({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
     const [access_token, refresh_token] = await this.signAccessAndRefreshToken({
       user_id,
@@ -59,17 +73,25 @@ class UsersService {
   }
 
   async register(payload: RegisterReqBody) {
-    const result = await databaseService.users.insertOne(
+    const user_id = new ObjectId()
+    const emailVerifyToken = await this.signEmailVerifyToken({
+      user_id: user_id.toString(),
+      verify: UserVerifyStatus.Unverified
+    })
+    await databaseService.users.insertOne(
       new User({
         ...payload,
+        _id: user_id,
+        email_verify_token: emailVerifyToken,
         password: hashPassword(payload.password)
       })
     )
-    const user_id = result.insertedId.toString()
+    // const user_id = result.insertedId.toString()
     const [access_token, refresh_token] = await this.signAccessAndRefreshToken({
       user_id: user_id.toString(),
       verify: UserVerifyStatus.Unverified
     })
+
     await databaseService.refreshTokens.insertOne(
       new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token })
     )
@@ -107,6 +129,27 @@ class UsersService {
     return {
       access_token: new_access_token,
       refresh_token: new_refresh_token
+    }
+  }
+
+  async verifyEmail({ user_id }: { user_id: string }) {
+    // Dùng new Date() thì thời gian tạo giá trị
+    // $currentDate: { updated_at: true } thì thời gian mà MongoDB cập nhật giá trị, hoặc chuyển thành mảng [{$set: { updated_at: '$$NOW' }}]
+    const [token] = await Promise.all([
+      this.signAccessAndRefreshToken({ user_id, verify: UserVerifyStatus.Verified }),
+      databaseService.users.updateOne(
+        { _id: new ObjectId(user_id) },
+        {
+          $set: { verify: UserVerifyStatus.Verified, email_verify_token: '', updated_at: new Date() },
+          $currentDate: { updated_at: true }
+        }
+      )
+    ])
+    const [access_token, refresh_token] = token
+
+    return {
+      access_token,
+      refresh_token
     }
   }
 }
