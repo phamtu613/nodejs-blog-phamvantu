@@ -24,5 +24,12 @@ export const USERS_MESSAGES = {
   REFRESH_TOKEN_SUCCESS: 'Làm mới accesstoken thành công',
   EMAIL_VERIFICATION_TOKEN_IS_REQUIRED: 'Email verification token không được để trống',
   EMAIL_ALREADY_VERIFIED: 'Email đã được xác thực trước đó',
-  EMAIL_VERIFICATION_SUCCESS: 'Xác thực email thành công'
+  EMAIL_VERIFICATION_SUCCESS: 'Xác thực email thành công',
+  RESEND_EMAIL_VERIFY_SUCCESS: 'Gửi lại email xác thực thành công',
+  CHECK_EMAIL_TO_RESET_PASSWORD: 'Vui lòng kiểm tra email để reset mật khẩu',
+  FORGOT_PASSWORD_TOKEN_IS_REQUIRED: 'Forgot password token không được để trống',
+  VERIFY_FORGOT_PASSWORD_TOKEN_SUCCESS: 'Xác thực forgot password token thành công',
+  FORGOT_PASSWORD_TOKEN_INVALID: 'Forgot password token không hợp lệ',
+  RESET_PASSWORD_SUCCESS: 'Đặt lại mật khẩu thành công',
+  ACCESS_TOKEN_MUST_BE_A_STRING: 'Accesstoken phải là chuỗi'
 } as const
