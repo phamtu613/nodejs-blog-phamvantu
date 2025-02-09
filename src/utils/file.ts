@@ -34,7 +34,6 @@ export const handleUploadSingleImage = (req: Request) => {
       if (!files.image) {
         return reject(new Error('No file uploaded'))
       }
-      console.log('xxx', files)
       resolve(files.image[0])
     })
   })

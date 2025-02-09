@@ -4,6 +4,9 @@ import sharp from 'sharp'
 import { UPLOAD_DIR } from '~/constants/dir'
 import { getNameFromFullname, handleUploadSingleImage } from '~/utils/file'
 import fs from 'fs'
+import { isProduction } from '~/constants/config'
+import { config } from 'dotenv'
+config()
 
 class MediaService {
   async handleUploadSingleImage(req: Request) {
@@ -12,7 +15,9 @@ class MediaService {
     const newPath = path.resolve(UPLOAD_DIR, `${newName}.webp`)
     await sharp(file.filepath).webp().toFile(newPath)
     fs.unlinkSync(file.filepath)
-    return `http://localhost:3000/uploads/${newName}.webp`
+    return isProduction
+      ? `${process.env.HOST}/medias/${newName}.webp`
+      : `http://localhost:${process.env.PORT}/medias/${newName}.webp`
   }
 }
 

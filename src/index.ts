@@ -6,9 +6,14 @@ import postRouter from '~/routes/posts.routes'
 import usersRouter from '~/routes/users.routes'
 import databaseService from '~/services/database.services'
 import { initFolder } from '~/utils/file'
+import argv from 'minimist'
 
 const app = express()
-const port = 4000
+const port = process.env.PORT || 4000
+
+import { isProduction } from '~/constants/config'
+import { config } from 'dotenv'
+config()
 
 databaseService.connect()
 
