@@ -9,3 +9,9 @@ export const wrapRequestHandler = (func: RequestHandler) => {
     }
   }
 }
+
+export const extractImageFromYoast = (yoastHead: string): string | null => {
+  const regex = /<meta (?:property|name)="(?:og:image|twitter:image)" content="([^"]+)"/
+  const match = yoastHead.match(regex)
+  return match ? match[1] : null
+}

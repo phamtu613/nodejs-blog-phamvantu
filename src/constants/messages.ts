@@ -31,5 +31,6 @@ export const USERS_MESSAGES = {
   VERIFY_FORGOT_PASSWORD_TOKEN_SUCCESS: 'Xác thực forgot password token thành công',
   FORGOT_PASSWORD_TOKEN_INVALID: 'Forgot password token không hợp lệ',
   RESET_PASSWORD_SUCCESS: 'Đặt lại mật khẩu thành công',
-  ACCESS_TOKEN_MUST_BE_A_STRING: 'Accesstoken phải là chuỗi'
+  ACCESS_TOKEN_MUST_BE_A_STRING: 'Accesstoken phải là chuỗi',
+  UPLOAD_SUCCESS: 'Tải lên thành công'
 } as const

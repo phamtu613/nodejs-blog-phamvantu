@@ -248,17 +248,25 @@ class UsersService {
     }
   }
 
-  async updateUser(user_id: string, name: string) {
+  async updateUser(user_id: string, name: string, cover_photo: string) {
     await databaseService.users.updateOne(
       { _id: new ObjectId(user_id) },
       {
-        $set: { name },
+        $set: { name, cover_photo },
         $currentDate: { updated_at: true }
       }
     )
     return {
       message: 'Cập nhật tài khoản thành công'
     }
+  }
+
+  // Admin
+  async getAccountList() {
+    const users = await databaseService.users
+      .find({}, { projection: { password: 0, email_verify_token: 0, forgot_password_token: 0 } })
+      .toArray()
+    return users
   }
 }
 

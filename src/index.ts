@@ -6,13 +6,16 @@ import postRouter from '~/routes/posts.routes'
 import usersRouter from '~/routes/users.routes'
 import databaseService from '~/services/database.services'
 import { initFolder } from '~/utils/file'
-import argv from 'minimist'
 
 const app = express()
 const port = process.env.PORT || 4000
 
-import { isProduction } from '~/constants/config'
 import { config } from 'dotenv'
+import path from 'path'
+import { UPLOAD_DIR } from '~/constants/dir'
+import accountsRouter from '~/routes/accounts.routes'
+import categoriesRouter from '~/routes/categories.routes'
+import contactsRouter from '~/routes/contacts.routes'
 config()
 
 databaseService.connect()
@@ -33,6 +36,10 @@ app.use(express.json())
 app.use('/users', usersRouter)
 app.use('/medias', mediasRouter)
 app.use('/posts', postRouter)
+app.use('/accounts', accountsRouter)
+app.use('/categories', categoriesRouter)
+app.use('/contacts', contactsRouter)
+app.use('/static', express.static(path.resolve(UPLOAD_DIR)))
 
 app.use(defaultErrorHandler as ErrorRequestHandler)
 

@@ -44,3 +44,12 @@ export const getNameFromFullname = (fullname: string) => {
   nameArr.pop()
   return nameArr.join('')
 }
+
+export const downloadImage = async (imageUrl: string, outputPath: string) => {
+  const response = await fetch(imageUrl)
+  if (!response.ok) {
+    throw new Error(`Failed to fetch image from URL: ${imageUrl}`)
+  }
+  const buffer = Buffer.from(await response.arrayBuffer())
+  fs.writeFileSync(outputPath, buffer)
+}

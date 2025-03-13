@@ -176,7 +176,7 @@ export const userController = async (req: Request, res: Response) => {
 
 export const updateUserController = async (req: Request, res: Response) => {
   const { user_id } = req.decoded_authorization as TokenPayload
-  const { name } = req.body
-  const result = await usersService.updateUser(user_id, name)
+  const { name, cover_photo } = req.body
+  const result = await usersService.updateUser(user_id, name, cover_photo)
   res.json(result)
 }
