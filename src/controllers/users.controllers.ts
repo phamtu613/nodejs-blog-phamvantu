@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
-import usersService from '~/services/users.services'
 import { ParamsDictionary } from 'express-serve-static-core'
+import { ObjectId } from 'mongodb'
+import { USERS_MESSAGES } from '~/constants/messages'
 import {
   ForgotPasswordReqBody,
   LoginReqBody,
@@ -13,11 +14,10 @@ import {
   VerifyResetPasswordTokenReqBody
 } from '~/models/schemas/requests/User.requests'
 import User from '~/models/schemas/User.schema'
-import { ObjectId } from 'mongodb'
-import { USERS_MESSAGES } from '~/constants/messages'
 import databaseService from '~/services/database.services'
+import emailService from '~/services/email.services'
+import usersService from '~/services/users.services'
 import { Role, UserVerifyStatus } from '~/types/users.type'
-import { verify } from 'crypto'
 import { verifyToken } from '~/utils/jwt'
 // import { UserVerifyStatus } from '~/constants/enums'
 
@@ -69,6 +69,17 @@ export const registerController = async (
   }
 
   const result = await usersService.register(req.body)
+
+  // Send verification email using template
+  const verifyUrl = `${process.env.WEB_APP_URL}/verify-email?email-verify-token=${result.account.email_verify_token}`
+  const emailSubject = 'Xác nhận tài khoản blog phamvantu.com'
+  const emailVariables = {
+    name: req.body.name,
+    verifyUrl
+  }
+
+  await emailService.sendTemplateMail(req.body.email, emailSubject, 'verify-email', emailVariables)
+
   res.json({ message: 'Đăng ký thành công', data: result })
   return
 }
@@ -130,6 +141,15 @@ export const resendVerifyEmailController = async (req: Request, res: Response) =
     return
   }
   const result = await usersService.resendEmailVerify({ user_id })
+
+  // Send verification email using template
+  const verifyUrl = `${process.env.WEB_APP_URL}/verify-email?email-verify-token=${result.account && result.account.email_verify_token}`
+  const emailSubject = 'Xác nhận tài khoản - phamvantu.com'
+  const emailVariables = {
+    name: user.name,
+    verifyUrl
+  }
+  await emailService.sendTemplateMail(user.email, emailSubject, 'verify-email', emailVariables)
   res.json(result)
 }
 
@@ -140,7 +160,21 @@ export const forgotPasswordController = async (
   const { _id, verify } = req.user as User
 
   const result = await usersService.forgotPassword((_id as ObjectId).toString(), verify)
-  res.json(result)
+  console.log('result>>>', result)
+  // Send verification email using template
+  const forgotPasswordUrl = `${process.env.WEB_APP_URL}/verify-forgot-password?forgot-password-token=${result.account?.forgot_password_token}`
+  const emailSubject = 'Lấy lại mật khẩu - phamvantu.com'
+  const emailVariables = {
+    name: result.account?.name,
+    forgotPasswordUrl
+  }
+
+  await emailService.sendTemplateMail((result.account as any).email, emailSubject, 'forgot-password', emailVariables)
+
+  // console.log('forgot_password_token>>>', forgot_password_token)
+
+  res.json(result.message)
+  return
 }
 
 export const verifyResetPasswordTokenController = async (
@@ -178,5 +212,12 @@ export const updateUserController = async (req: Request, res: Response) => {
   const { user_id } = req.decoded_authorization as TokenPayload
   const { name, cover_photo } = req.body
   const result = await usersService.updateUser(user_id, name, cover_photo)
+  res.json(result)
+}
+
+export const changePasswordController = async (req: Request, res: Response) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const { password, new_password } = req.body
+  const result = await usersService.changePassword(user_id, password, new_password)
   res.json(result)
 }

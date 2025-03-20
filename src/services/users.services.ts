@@ -1,6 +1,7 @@
 import { config } from 'dotenv'
 import { ObjectId } from 'mongodb'
 import { USERS_MESSAGES } from '~/constants/messages'
+import { ErrorWithStatus } from '~/models/Errors'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import { RegisterReqBody } from '~/models/schemas/requests/User.requests'
 import User from '~/models/schemas/User.schema'
@@ -197,9 +198,11 @@ class UsersService {
         $currentDate: { updated_at: true }
       }
     )
+    const account = await databaseService.users.findOne({ _id: new ObjectId(user_id) })
     const message = USERS_MESSAGES.RESEND_EMAIL_VERIFY_SUCCESS
     return {
-      message
+      message,
+      account
     }
   }
 
@@ -212,10 +215,12 @@ class UsersService {
         $currentDate: { updated_at: true }
       }
     )
+    const account = await databaseService.users.findOne({ _id: new ObjectId(user_id) })
     // Gui email cho user kèm link reset password: http://localhost:3000/forgot-password?token=forgot_password_token
-    console.log('forgot_password_token>>>', forgot_password_token)
+
     return {
-      message: USERS_MESSAGES.CHECK_EMAIL_TO_RESET_PASSWORD
+      message: USERS_MESSAGES.CHECK_EMAIL_TO_RESET_PASSWORD,
+      account
     }
   }
 
@@ -249,15 +254,53 @@ class UsersService {
   }
 
   async updateUser(user_id: string, name: string, cover_photo: string) {
+    // if has name update name and no update name
+    const updateFields: Record<string, any> = {}
+    if (name) {
+      updateFields.name = name
+    }
+    if (cover_photo) {
+      updateFields.cover_photo = cover_photo
+    }
     await databaseService.users.updateOne(
       { _id: new ObjectId(user_id) },
       {
-        $set: { name, cover_photo },
+        $set: updateFields,
         $currentDate: { updated_at: true }
       }
     )
     return {
       message: 'Cập nhật tài khoản thành công'
+    }
+  }
+
+  async changePassword(user_id: string, current_password: string, new_password: string) {
+    const user = await databaseService.users.findOne({ _id: new ObjectId(user_id) })
+    if (!user) {
+      return {
+        message: USERS_MESSAGES.USER_NOT_FOUND
+      }
+    }
+    if (!user.password) {
+      return {
+        message: USERS_MESSAGES.USER_NOT_FOUND
+      }
+    }
+    if (user.password !== hashPassword(current_password)) {
+      throw new ErrorWithStatus({
+        message: 'Mật khẩu hiện tại không chính xác',
+        status: 400
+      })
+    }
+    await databaseService.users.updateOne(
+      { _id: new ObjectId(user_id) },
+      {
+        $set: { password: hashPassword(new_password) },
+        $currentDate: { updated_at: true }
+      }
+    )
+    return {
+      message: 'Đổi mật khẩu thành công'
     }
   }
 

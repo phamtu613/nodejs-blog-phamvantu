@@ -39,6 +39,7 @@
   "dependencies": {
     "@types/formidable": "^3.4.5",
     "@types/minimist": "^1.2.5",
+    "@types/nodemailer": "^6.4.17",
     "@types/react-router-dom": "^5.3.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
@@ -50,6 +51,7 @@
     "minimist": "^1.2.8",
     "mongodb": "^6.12.0",
     "node-fetch": "^3.3.2",
+    "nodemailer": "^6.10.0",
     "react-router-dom": "^7.1.1",
     "sharp": "^0.33.5",
     "slugify": "^1.6.6",
