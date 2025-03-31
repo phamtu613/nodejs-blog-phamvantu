@@ -6,6 +6,7 @@ export interface PostType {
   title: string
   slug: string
   content: string
+  content_html: string
   thumbnail?: string
   categories: ObjectId[]
   status: PostStatusType
@@ -20,6 +21,7 @@ export default class Post {
   title: string
   slug: string
   content: string
+  content_html: string
   thumbnail?: string
   categories: ObjectId[]
   status: PostStatusType
@@ -33,6 +35,7 @@ export default class Post {
     this.title = post.title
     this.slug = post.slug
     this.content = post.content
+    this.content_html = post.content_html || ''
     this.thumbnail = post.thumbnail || ''
     this.categories = post.categories ?? []
     this.status = post.status || PostStatus.Public

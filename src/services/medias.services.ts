@@ -21,17 +21,32 @@ class MediaService {
   }
 
   async uploadImageFromUrl(imageUrl: string) {
-    const newName = getNameFromFullname(path.basename(imageUrl))
-    const tempPath = path.resolve(UPLOAD_DIR, `${newName}-temp`)
-    const finalPath = path.resolve(UPLOAD_DIR, `${newName}.webp`)
-    await downloadImage(imageUrl, tempPath)
-    const tempWebpPath = path.resolve(UPLOAD_DIR, `${newName}-temp.webp`)
-    await sharp(tempPath).webp().toFile(tempWebpPath)
-    fs.renameSync(tempWebpPath, finalPath)
-    fs.unlinkSync(tempPath)
-    return isProduction
-      ? `${process.env.HOST}/static/${newName}.webp`
-      : `http://localhost:${process.env.PORT}/static/${newName}.webp`
+    try {
+      console.log('Starting image upload from URL:', imageUrl)
+      const newName = getNameFromFullname(path.basename(imageUrl))
+      const tempPath = path.resolve(UPLOAD_DIR, `${newName}-temp`)
+      const finalPath = path.resolve(UPLOAD_DIR, `${newName}.webp`)
+
+      await downloadImage(imageUrl, tempPath)
+      console.log('Image downloaded successfully')
+
+      const tempWebpPath = path.resolve(UPLOAD_DIR, `${newName}-temp.webp`)
+      await sharp(tempPath).webp().toFile(tempWebpPath)
+      console.log('Image converted to WebP')
+
+      fs.renameSync(tempWebpPath, finalPath)
+      fs.unlinkSync(tempPath)
+
+      const finalUrl = isProduction
+        ? `${process.env.HOST}/static/${newName}.webp`
+        : `http://localhost:${process.env.PORT}/static/${newName}.webp`
+
+      console.log('Final image URL:', finalUrl)
+      return finalUrl
+    } catch (error) {
+      console.error('Error uploading image from URL:', error)
+      throw error
+    }
   }
 }
 

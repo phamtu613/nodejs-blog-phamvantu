@@ -10,7 +10,8 @@ import { extractImageFromYoast } from '~/utils/handlers'
 
 export const crawPostController = async (req: Request<ParamsDictionary, any, LoginReqBody>, res: Response) => {
   try {
-    const url = 'https://phamvantu.com/wp-json/wp/v2/posts?per_page=100&_fields=id,date,slug,title,content, yoast_head'
+    console.log('crawl post>>>>')
+    const url = 'https://v0.phamvantu.com/wp-json/wp/v2/posts?per_page=10&_fields=id,date,slug,title,content, yoast_head'
     const response = await fetch(url)
     if (!response.ok) {
       res.status(response.status).json({
@@ -24,38 +25,48 @@ export const crawPostController = async (req: Request<ParamsDictionary, any, Log
 
     // Check for images and upload to server
     for (const post of posts) {
-      // Tìm tất cả thẻ <img> trong nội dung bài viết
-      const imageTags = post.content.rendered.match(/<img[^>]+>/g)
-      if (imageTags) {
-        for (const imgTag of imageTags) {
-          // Tìm URL ảnh trong `src`
-          const srcMatch = imgTag.match(/src="([^">]+)"/)
-          if (srcMatch) {
-            const originalImageUrl = srcMatch[1] // Lấy URL gốc
-
-            // Upload ảnh chỉ một lần
-            const uploadedImageUrl = await mediaService.uploadImageFromUrl(originalImageUrl)
-
-            // Lấy tiêu đề bài viết để làm alt và title
-            const postTitle = post.title.rendered || 'Ảnh bài viết'
-
-            // Tạo thẻ <img> mới với src đã thay đổi, alt và title lấy từ tiêu đề bài viết
-            const newImgTag = `<img src="${uploadedImageUrl}" alt="${postTitle}" title="${postTitle}" />`
-
-            // Thay thế thẻ cũ bằng thẻ mới
-            post.content.rendered = post.content.rendered.replace(imgTag, newImgTag)
-          }
-        }
-      }
+      console.log('=== Xử lý bài viết:', post.title.rendered)
+      console.log('Nội dung gốc:', post.content.rendered.substring(0, 5000) + '...')
 
       const thumbnail = extractImageFromYoast(post.yoast_head) as string
       const uploadedImageUrl = await mediaService.uploadImageFromUrl(thumbnail)
 
       const newTitle = post.title.rendered
       const newContent = post.content.rendered
+      console.log('newContent>>>', newContent)
 
+      // 1. Chuyển sang markdown trước
       let markdownContent = convertToMarkdown(newContent)
+      console.log('Content sau khi chuyển markdown:', markdownContent)
 
+      // 2. Xử lý các thẻ img
+      const markdownImageTags = markdownContent.match(/<img[^>]+>/g)
+      if (markdownImageTags) {
+        console.log('Số lượng ảnh tìm thấy trong markdown:', markdownImageTags.length)
+        for (const imgTag of markdownImageTags) {
+          console.log('Xử lý thẻ img trong markdown:', imgTag)
+          const srcMatch = imgTag.match(/src="([^">]+)"/) || imgTag.match(/src='([^'>]+)'/)
+          if (srcMatch) {
+            const originalImageUrl = srcMatch[1]
+            console.log('URL ảnh gốc:', originalImageUrl)
+
+            try {
+              const uploadedImageUrl = await mediaService.uploadImageFromUrl(originalImageUrl)
+              console.log('URL ảnh sau khi upload:', uploadedImageUrl)
+
+              const postTitle = post.title.rendered || 'Ảnh bài viết'
+              const newImgTag = `<img src="${uploadedImageUrl}" alt="${postTitle}" title="${postTitle}" class="img-fluid" />`
+
+              markdownContent = markdownContent.replace(imgTag, newImgTag)
+              console.log('Đã thay thế thẻ img thành công')
+            } catch (error) {
+              console.error('Lỗi khi xử lý ảnh:', error)
+            }
+          }
+        }
+      }
+
+      // 3. Xử lý các định dạng markdown khác
       markdownContent = markdownContent
         .replace(/\*\*(\s*)(.+?)(\s*)\*\*/g, '**$2**') // Xóa khoảng trắng thừa trong **bold**
         .replace(/\[ \*\*(.+?)\*\* \]/g, '[**$1**]') // Fix lỗi **bold** trong []
@@ -70,12 +81,33 @@ export const crawPostController = async (req: Request<ParamsDictionary, any, Log
           return `\n\n### ${cleanContent}\n\n`
         })
 
+      console.log('Content cuối cùng:', markdownContent)
+
+      // Build HTML từ markdown
+      const content_html = markdownContent
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
+        .replace(/\*(.*?)\*/g, '<em>$1</em>') // Italic
+        .replace(/`(.*?)`/g, '<code>$1</code>') // Inline code
+        .replace(/```(\w+)?\n([\s\S]*?)```/g, (_, lang, code) => {
+          return `<pre><code class="language-${lang || ''}">${code.trim()}</code></pre>`
+        }) // Code block
+        .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>') // Links
+        .replace(/\n\n/g, '</p><p>') // Paragraphs
+        .replace(/\n/g, '<br>') // Line breaks
+        .replace(/### (.*?)(\n|$)/g, '<h3>$1</h3>') // Headings
+        .replace(/## (.*?)(\n|$)/g, '<h2>$1</h2>')
+        .replace(/# (.*?)(\n|$)/g, '<h1>$1</h1>')
+
+      // Wrap content in paragraphs
+      const finalHtml = `<div class="post-content">${content_html}</div>`
+
       await postsService.createPost({
         ...post,
         title: newTitle,
         content: markdownContent,
+        content_html: finalHtml, // Lưu HTML đã build
         views: random(0, 100),
-        thumbnail: uploadedImageUrl.replace('http://localhost:4000/', '')
+        thumbnail: uploadedImageUrl.replace('https://api.phamvantu.com/', '')
       })
 
       // console.log('Post>>>', post)
@@ -114,7 +146,13 @@ export const getDetailPostController = async (req: Request<ParamsDictionary, any
     res.json({ message: 'Bài viết không tồn tại' })
     return
   }
-  res.json({ message: 'Lấy bài viết thành công', data: post })
+  res.json({
+    message: 'Lấy bài viết thành công',
+    data: {
+      ...post,
+      content: post.content_html // Trả về HTML đã build sẵn
+    }
+  })
   return
 }
 

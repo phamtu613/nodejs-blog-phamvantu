@@ -44,8 +44,8 @@ export function convertToMarkdown(html: string) {
       .replace(/<\/?p>/g, '\n\n')
       // Chuyển đổi `<br>` thành xuống dòng
       .replace(/<br\s*\/?>/g, '\n')
-      // Giữ nguyên `<iframe>` và xóa các thẻ HTML còn lại
-      .replace(/<(?!iframe)([^>]+)>/g, '')
+      // Giữ nguyên `<iframe>` và `<img>`, xóa các thẻ HTML còn lại
+      .replace(/<(?!iframe|img)([^>]+)>/g, '')
       // Chuẩn hóa khoảng trắng và dấu xuống dòng dư thừa
       .replace(/&nbsp;/g, ' ')
       .replace(/\n{3,}/g, '\n\n')

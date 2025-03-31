@@ -26,7 +26,6 @@ export const getCategoryDetailController = async (req: Request<ParamsDictionary,
   if (category?._id) {
     const posts = await postsService.getPostListByCategory(category?._id as any)
   }
-  console.log('category>>>', category)
   res.json({
     message: 'Lấy danh mục thành công',
     data: {
