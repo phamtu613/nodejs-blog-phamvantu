@@ -23,7 +23,7 @@ databaseService.connect()
 // use là middleware function, nó sẽ chạy trước khi request được xử lý
 app.use(
   cors({
-    origin: 'http://localhost:3000', // Thay bằng URL của frontend (Next.js)
+    origin: ['http://localhost:3000', 'https://phamvantu.com'], // Allow both development and production domains
     methods: 'GET,POST,PUT,DELETE', // Cho phép các method HTTP
     credentials: true // Nếu bạn cần gửi cookie
   })
