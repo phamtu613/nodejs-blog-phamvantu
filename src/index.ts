@@ -23,7 +23,7 @@ databaseService.connect()
 // use là middleware function, nó sẽ chạy trước khi request được xử lý
 app.use(
   cors({
-    origin: ['http://localhost:3000', 'https://phamvantu.com'], // Allow both development and production domains
+    origin: [process.env.WEB_APP_URL as string, process.env.HOST as string], // Allow both development and production domains
     methods: 'GET,POST,PUT,DELETE', // Cho phép các method HTTP
     credentials: true // Nếu bạn cần gửi cookie
   })

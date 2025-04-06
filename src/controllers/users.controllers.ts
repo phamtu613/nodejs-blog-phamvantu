@@ -19,13 +19,12 @@ import emailService from '~/services/email.services'
 import usersService from '~/services/users.services'
 import { Role, UserVerifyStatus } from '~/types/users.type'
 import { verifyToken } from '~/utils/jwt'
-// import { UserVerifyStatus } from '~/constants/enums'
 
 // Xử lý logic ở đây sau khi dữ liệu đã được validate ở middleware
 export const loginController = async (req: Request<ParamsDictionary, any, LoginReqBody>, res: Response) => {
   const user = req.user as User
   const user_id = user._id as ObjectId
-  const result = await usersService.login({ user_id: user_id.toString(), verify: user.verify })
+  const result = await usersService.login({ user_id: user_id.toString(), verify: user.verify, role: user.role })
   res.json({
     message: USERS_MESSAGES.LOGIN_SUCCESS,
     data: {

@@ -3,6 +3,7 @@ import { ParamsDictionary } from 'express-serve-static-core'
 import { CategoryType } from '~/models/schemas/Category.schema'
 import categoriesService from '~/services/categories.services'
 import postsService from '~/services/posts.services'
+import { PostType } from '~/models/schemas/Post.schema'
 
 export const createCategoryController = async (req: Request<ParamsDictionary, any, CategoryType>, res: Response) => {
   const result = await categoriesService.createCategory(req.body)
@@ -21,16 +22,16 @@ export const getCategoryDetailController = async (req: Request<ParamsDictionary,
   const category = await categoriesService.getCategoryDetail(req.params.slug)
   // get all posts of category
 
-  let posts
+  let posts: PostType[] = []
 
   if (category?._id) {
-    const posts = await postsService.getPostListByCategory(category?._id as any)
+    posts = await postsService.getPostListByCategory(category?._id as any)
   }
   res.json({
     message: 'Lấy danh mục thành công',
     data: {
       ...category,
-      posts: posts ?? []
+      posts
     }
   })
   return

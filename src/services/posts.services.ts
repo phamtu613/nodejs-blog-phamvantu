@@ -17,7 +17,8 @@ class PostsService {
       views: post.views || 0,
       created_at: post.date || new Date(),
       updated_at: new Date(),
-      content: post?.content
+      content: post?.content,
+      content_html: post?.content_html
     })
   }
 

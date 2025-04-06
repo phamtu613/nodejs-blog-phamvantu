@@ -1,4 +1,5 @@
 import { config } from 'dotenv'
+import { ObjectId } from 'mongodb'
 import slugify from 'slugify'
 import { CategoryType } from '~/models/schemas/Category.schema'
 import databaseService from '~/services/database.services'
@@ -7,7 +8,6 @@ config()
 
 class CategoriesService {
   async createCategory(category: any) {
-    console.log(category)
     await databaseService.categories.insertOne({
       name: category.name,
       slug: slugify(category.name, { lower: true }),
@@ -25,7 +25,7 @@ class CategoriesService {
   }
 
   async updateCategory(id: string, category: CategoryType) {
-    // Logic to update a category
+    return await databaseService.categories.updateOne({ _id: new ObjectId(id) }, { $set: category })
   }
 
   async deleteCategory(id: string) {

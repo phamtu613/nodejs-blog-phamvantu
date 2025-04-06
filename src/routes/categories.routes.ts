@@ -3,7 +3,8 @@ import { getAccountListController } from '~/controllers/accounts.controllers'
 import {
   createCategoryController,
   getCategoryDetailController,
-  getCategoryListController
+  getCategoryListController,
+  updateCategoryController
 } from '~/controllers/categories.controllers'
 import { wrapRequestHandler } from '~/utils/handlers'
 
@@ -35,5 +36,15 @@ categoriesRouter.post('/', wrapRequestHandler(createCategoryController))
  * }
  */
 categoriesRouter.get('/:slug', wrapRequestHandler(getCategoryDetailController))
+
+/**
+ * Description: Update a category
+ * Path: /categories/:slug
+ * Method: PUT
+ * Request params: {
+ *  slug: string
+ * }
+ */
+categoriesRouter.put('/:id', wrapRequestHandler(updateCategoryController))
 
 export default categoriesRouter

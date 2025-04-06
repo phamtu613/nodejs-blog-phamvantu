@@ -14,12 +14,21 @@ import { signToken } from '~/utils/jwt'
 config()
 
 class UsersService {
-  private signAccessToken({ user_id, verify }: { user_id: string; verify: UserVerifyStatusType }) {
+  private signAccessToken({
+    user_id,
+    verify,
+    role
+  }: {
+    user_id: string
+    verify: UserVerifyStatusType
+    role: RoleType
+  }) {
     return signToken({
       payload: {
         user_id,
         token_type: TokenType.AccessToken,
-        verify
+        verify,
+        role
       },
       privateKey: process.env.JWT_SECRET_ACCESS_TOKEN as string,
       options: {
@@ -28,12 +37,21 @@ class UsersService {
     })
   }
 
-  private signRefreshToken({ user_id, verify }: { user_id: string; verify: UserVerifyStatusType }) {
+  private signRefreshToken({
+    user_id,
+    verify,
+    role
+  }: {
+    user_id: string
+    verify: UserVerifyStatusType
+    role: RoleType
+  }) {
     return signToken({
       payload: {
         user_id,
         token_type: TokenType.RefreshToken,
-        verify
+        verify,
+        role
       },
       privateKey: process.env.JWT_SECRET_REFRESH_TOKEN as string,
       options: {
@@ -42,8 +60,19 @@ class UsersService {
     })
   }
 
-  private signAccessAndRefreshToken({ user_id, verify }: { user_id: string; verify: UserVerifyStatusType }) {
-    return Promise.all([this.signAccessToken({ user_id, verify }), this.signRefreshToken({ user_id, verify })])
+  private signAccessAndRefreshToken({
+    user_id,
+    verify,
+    role
+  }: {
+    user_id: string
+    verify: UserVerifyStatusType
+    role: RoleType
+  }) {
+    return Promise.all([
+      this.signAccessToken({ user_id, verify, role }),
+      this.signRefreshToken({ user_id, verify, role })
+    ])
   }
 
   private signEmailVerifyToken({ user_id, verify }: { user_id: string; verify: UserVerifyStatusType }) {
@@ -74,10 +103,11 @@ class UsersService {
     })
   }
 
-  async login({ user_id, verify }: { user_id: string; verify: UserVerifyStatusType }) {
+  async login({ user_id, verify, role }: { user_id: string; verify: UserVerifyStatusType; role: RoleType }) {
     const [access_token, refresh_token] = await this.signAccessAndRefreshToken({
       user_id,
-      verify
+      verify,
+      role
     })
     await databaseService.refreshTokens.insertOne(
       new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token })
@@ -104,7 +134,8 @@ class UsersService {
     )
     const [access_token, refresh_token] = await this.signAccessAndRefreshToken({
       user_id: user_id.toString(),
-      verify: UserVerifyStatus.Unverified
+      verify: UserVerifyStatus.Unverified,
+      role: payload?.role || Role.User
     })
 
     await databaseService.refreshTokens.insertOne(
@@ -151,8 +182,8 @@ class UsersService {
     role: RoleType
   }) {
     const [new_access_token, new_refresh_token] = await Promise.all([
-      this.signAccessToken({ user_id, verify }),
-      this.signRefreshToken({ user_id, verify }),
+      this.signAccessToken({ user_id, verify, role }),
+      this.signRefreshToken({ user_id, verify, role }),
       databaseService.refreshTokens.deleteOne({ token: refresh_token })
     ])
     return {
@@ -166,7 +197,7 @@ class UsersService {
     // Dùng new Date() thì thời gian tạo giá trị
     // $currentDate: { updated_at: true } thì thời gian mà MongoDB cập nhật giá trị, hoặc chuyển thành mảng [{$set: { updated_at: '$$NOW' }}]
     const [token] = await Promise.all([
-      this.signAccessAndRefreshToken({ user_id, verify: UserVerifyStatus.Verified }),
+      this.signAccessAndRefreshToken({ user_id, verify: UserVerifyStatus.Verified, role: Role.User }),
       databaseService.users.updateOne(
         { _id: new ObjectId(user_id) },
         {

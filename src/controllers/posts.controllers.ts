@@ -11,7 +11,8 @@ import { extractImageFromYoast } from '~/utils/handlers'
 export const crawPostController = async (req: Request<ParamsDictionary, any, LoginReqBody>, res: Response) => {
   try {
     console.log('crawl post>>>>')
-    const url = 'https://v0.phamvantu.com/wp-json/wp/v2/posts?per_page=10&_fields=id,date,slug,title,content, yoast_head'
+    const url =
+      'https://v0.phamvantu.com/wp-json/wp/v2/posts?per_page=100&_fields=id,date,slug,title,content, yoast_head'
     const response = await fetch(url)
     if (!response.ok) {
       res.status(response.status).json({
@@ -107,7 +108,7 @@ export const crawPostController = async (req: Request<ParamsDictionary, any, Log
         content: markdownContent,
         content_html: finalHtml, // Lưu HTML đã build
         views: random(0, 100),
-        thumbnail: uploadedImageUrl.replace('https://api.phamvantu.com/', '')
+        thumbnail: uploadedImageUrl.replace(`${process.env.HOST}/`, '')
       })
 
       // console.log('Post>>>', post)
@@ -149,8 +150,7 @@ export const getDetailPostController = async (req: Request<ParamsDictionary, any
   res.json({
     message: 'Lấy bài viết thành công',
     data: {
-      ...post,
-      content: post.content_html // Trả về HTML đã build sẵn
+      ...post
     }
   })
   return
