@@ -138,10 +138,15 @@ export const getPostListController = async (req: Request<ParamsDictionary, any, 
 }
 
 export const getDetailPostController = async (req: Request<ParamsDictionary, any, any>, res: Response) => {
-  const post = await postsService.getPostDetail(req.params.slug)
+  const originalSlug = req.params.slug
+  const encodedSlug = encodeURIComponent(originalSlug).toLowerCase()
+
+  const post = await postsService.getPostDetail(encodedSlug)
+
   if (!post) {
-    res.json({ message: 'Bài viết không tồn tại' })
-    return
+    return res.status(404).json({
+      message: 'Bài viết không tồn tại'
+    })
   }
   res.json({
     message: 'Lấy bài viết thành công',
