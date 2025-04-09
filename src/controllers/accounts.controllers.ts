@@ -6,7 +6,6 @@ import usersService from '~/services/users.services'
 export const getAccountListController = async (req: Request<ParamsDictionary, any, LoginReqBody>, res: Response) => {
   try {
     const accounts = await usersService.getAccountList()
-    console.log('accounts>>>', accounts)
     res.json({
       message: 'Get list account successfully',
       data: accounts

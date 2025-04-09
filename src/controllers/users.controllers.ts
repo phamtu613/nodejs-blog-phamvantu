@@ -110,7 +110,6 @@ export const verifyEmailTokenController = async (
 ) => {
   const { user_id, role } = req.decoded_email_verify_token as TokenPayload
   const user = await databaseService.users.findOne({ _id: new ObjectId(user_id) })
-  console.log('user>>>', user)
   if (!user) {
     res.status(404).json({ message: USERS_MESSAGES.USER_NOT_FOUND })
     return
@@ -122,8 +121,6 @@ export const verifyEmailTokenController = async (
   }
 
   const result = await usersService.verifyEmail({ user_id })
-  console.log('result>>>', result)
-
   res.json({ message: USERS_MESSAGES.EMAIL_VERIFICATION_SUCCESS, data: result })
   return
 }
@@ -159,7 +156,6 @@ export const forgotPasswordController = async (
   const { _id, verify } = req.user as User
 
   const result = await usersService.forgotPassword((_id as ObjectId).toString(), verify)
-  console.log('result>>>', result)
   // Send verification email using template
   const forgotPasswordUrl = `${process.env.WEB_APP_URL}/verify-forgot-password?forgot-password-token=${result.account?.forgot_password_token}`
   const emailSubject = 'Lấy lại mật khẩu - phamvantu.com'
@@ -169,8 +165,6 @@ export const forgotPasswordController = async (
   }
 
   await emailService.sendTemplateMail((result.account as any).email, emailSubject, 'forgot-password', emailVariables)
-
-  // console.log('forgot_password_token>>>', forgot_password_token)
 
   res.json(result.message)
   return

@@ -18,7 +18,6 @@ export const getCategoryListController = async (req: Request<ParamsDictionary, a
 }
 
 export const getCategoryDetailController = async (req: Request<ParamsDictionary, any, any>, res: Response) => {
-  console.log('>>>', req.params.slug)
   const category = await categoriesService.getCategoryDetail(req.params.slug)
   // get all posts of category
 

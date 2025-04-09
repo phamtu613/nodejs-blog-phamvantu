@@ -10,7 +10,6 @@ import { extractImageFromYoast } from '~/utils/handlers'
 
 export const crawPostController = async (req: Request<ParamsDictionary, any, LoginReqBody>, res: Response) => {
   try {
-    console.log('crawl post>>>>')
     const url =
       'https://v0.phamvantu.com/wp-json/wp/v2/posts?per_page=100&_fields=id,date,slug,title,content, yoast_head'
     const response = await fetch(url)
@@ -34,7 +33,6 @@ export const crawPostController = async (req: Request<ParamsDictionary, any, Log
 
       const newTitle = post.title.rendered
       const newContent = post.content.rendered
-      console.log('newContent>>>', newContent)
 
       // 1. Chuyển sang markdown trước
       let markdownContent = convertToMarkdown(newContent)
@@ -110,8 +108,6 @@ export const crawPostController = async (req: Request<ParamsDictionary, any, Log
         views: random(0, 100),
         thumbnail: uploadedImageUrl.replace(`${process.env.HOST}/`, '')
       })
-
-      // console.log('Post>>>', post)
     }
 
     // Trả kết quả về client
@@ -165,5 +161,11 @@ export const updatePostController = async (req: Request<ParamsDictionary, any, P
 export const searchPostController = async (req: Request<ParamsDictionary, any, any>, res: Response) => {
   const posts = await postsService.searchPost(req.query.q as string)
   res.json({ message: 'Tìm kiếm bài viết thành công', data: posts })
+  return
+}
+
+export const getRandomPostController = async (req: Request<ParamsDictionary, any, any>, res: Response) => {
+  const posts = await postsService.getPostRandom()
+  res.json({ message: 'Lấy bài viết ngẫu nhiên thành công', data: posts })
   return
 }

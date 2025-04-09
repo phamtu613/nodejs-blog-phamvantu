@@ -4,6 +4,7 @@ import {
   createPostController,
   getDetailPostController,
   getPostListController,
+  getRandomPostController,
   searchPostController,
   updatePostController
 } from '~/controllers/posts.controllers'
@@ -20,6 +21,9 @@ postRouter.get('/', wrapRequestHandler(getPostListController))
 
 // search post
 postRouter.get('/search', wrapRequestHandler(searchPostController))
+
+// get random post
+postRouter.get('/random', wrapRequestHandler(getRandomPostController))
 
 // get detail post
 postRouter.get('/:slug', wrapRequestHandler(getDetailPostController))

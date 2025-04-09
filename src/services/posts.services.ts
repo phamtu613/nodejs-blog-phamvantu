@@ -27,7 +27,6 @@ class PostsService {
   }
 
   async getPostListByCategory(categoryId: any) {
-    console.log('categoryId>>>', categoryId)
     return await databaseService.posts.find({ categories: categoryId.toString() }).toArray()
   }
 
@@ -54,10 +53,13 @@ class PostsService {
   }
 
   async searchPost(query: string) {
-    console.log('xxx', query)
     await databaseService.posts.createIndex({ title: 'text', content: 'text' })
 
     return await databaseService.posts.find({ $text: { $search: query } }).toArray()
+  }
+
+  async getPostRandom() {
+    return await databaseService.posts.aggregate([{ $sample: { size: 5 } }]).toArray()
   }
 }
 const postsService = new PostsService()

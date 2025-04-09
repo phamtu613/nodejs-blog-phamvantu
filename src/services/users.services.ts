@@ -193,7 +193,6 @@ class UsersService {
   }
 
   async verifyEmail({ user_id }: { user_id: string }) {
-    console.log('user_id>>> eeeee', user_id)
     // Dùng new Date() thì thời gian tạo giá trị
     // $currentDate: { updated_at: true } thì thời gian mà MongoDB cập nhật giá trị, hoặc chuyển thành mảng [{$set: { updated_at: '$$NOW' }}]
     const [token] = await Promise.all([
@@ -221,7 +220,6 @@ class UsersService {
       user_id,
       verify: UserVerifyStatus.Unverified
     })
-    console.log('emailVerifyToken>>>', emailVerifyToken)
     await databaseService.users.updateOne(
       { _id: new ObjectId(user_id) },
       {
