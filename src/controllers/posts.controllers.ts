@@ -144,7 +144,7 @@ export const getDetailPostController = async (req: Request<ParamsDictionary, any
   const post = await postsService.getPostDetail(encodedSlug)
 
   if (!post) {
-    return res.status(404).json({
+    res.status(404).json({
       message: 'Bài viết không tồn tại'
     })
   }
