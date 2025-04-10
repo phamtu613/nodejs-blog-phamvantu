@@ -147,13 +147,14 @@ export const getDetailPostController = async (req: Request<ParamsDictionary, any
     res.status(404).json({
       message: 'Bài viết không tồn tại'
     })
+  } else {
+    res.json({
+      message: 'Lấy bài viết thành công',
+      data: {
+        ...post
+      }
+    })
   }
-  res.json({
-    message: 'Lấy bài viết thành công',
-    data: {
-      ...post
-    }
-  })
   return
 }
 
